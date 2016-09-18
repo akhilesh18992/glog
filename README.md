@@ -13,7 +13,7 @@ glog is a leveled logging package for golang which is not much configurable. Mot
 ## Install
 
 ```
-go get https://github.com/akhilesh18992/glog
+go get github.com/akhilesh18992/glog
 ```
 
 
@@ -54,10 +54,6 @@ bin/program -v=2 -log_dir=./logs/ -infologfilename=program.log -errorlogfilename
 Log file name: program.log(All logs/errors/warning are written in same file)
 
 Note: flushinterval flag doesn't start with a hyphen and must be placed at the end otherwise any flag after it would be rejected.
-
-
-## FAQ
-
 
 
 [glog]: <https://github.com/golang/glog>
