@@ -875,13 +875,42 @@ func (l *loggingT) createFiles(sev severity) error {
 	return nil
 }
 
-const flushInterval = 30 * time.Second
+const defaultFlushInterval = 30 * time.Second
 
 // flushDaemon periodically flushes the log file buffers.
 func (l *loggingT) flushDaemon() {
-	for _ = range time.NewTicker(flushInterval).C {
+ 	for _ = range time.NewTicker(getFlushInterval()).C {
 		l.lockAndFlushAll()
 	}
+}
+
+const flushIntervalParamPrefix = "flushinterval="
+
+// gets flushinterval value from commandline or uses defaultFlushInterval
+func getFlushInterval() time.Duration {
+	var logFlushInterval int64
+	isFlushIntervalFlagPresent := false
+	var err error
+	for index := 1; index < len(os.Args); index++ {
+		if strings.HasPrefix(os.Args[index], flushIntervalParamPrefix) && isFlushIntervalFlagPresent == false {
+			flushIntervalValue := strings.Split(os.Args[index], flushIntervalParamPrefix)[1]
+			logFlushInterval, err = strconv.ParseInt(flushIntervalValue, 10, 64)
+			if err != nil {
+				fmt.Println("flushinterval value needs to be integer")
+				break
+			}
+			isFlushIntervalFlagPresent = true
+		} else if strings.HasPrefix(os.Args[index], flushIntervalParamPrefix) {
+			fmt.Println("Multiple flushinterval parameter found")
+			break
+		}
+	}
+	var flushInterval time.Duration
+	flushInterval = defaultFlushInterval
+	if isFlushIntervalFlagPresent {
+		flushInterval = time.Duration(logFlushInterval) * time.Second
+	}
+	return flushInterval
 }
 
 // lockAndFlushAll is like flushAll but locks l.mu first.

@@ -39,6 +39,9 @@ var logDirs []string
 // If non-empty, overrides the choice of directory in which to write logs.
 // See createLogDirs for the full list of possible destinations.
 var logDir = flag.String("log_dir", "", "If non-empty, write log files in this directory")
+var infoLogFileName = flag.String("infologfilename", "", "If non-empty, write info log to this file")
+var errorLogFileName = flag.String("errorlogfilename", "", "If non-empty, write error log to this file")
+var warningLogFileName = flag.String("warninglogfilename", "", "If non-empty, write warning log to this file")
 
 func createLogDirs() {
 	if *logDir != "" {
@@ -93,6 +96,13 @@ func logName(tag string, t time.Time) (name, link string) {
 		t.Minute(),
 		t.Second(),
 		pid)
+	if tag == "INFO" && *infoLogFileName != "" {
+		name = *infoLogFileName
+	} else if tag == "ERROR" && *errorLogFileName != "" {
+		name = *errorLogFileName
+	} else if tag == "WARNING" && *warningLogFileName != "" {
+		name = *warningLogFileName
+	}
 	return name, program + "." + tag
 }
 
